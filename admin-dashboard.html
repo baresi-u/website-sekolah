@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Admin - KB TK Mary Anthony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1E2A4A; --navy-soft:#2E3F66; --navy-pale:#26345A;
+    --gold:#C9A961; --gold-deep:#AD8A47; --gold-pale:#F3E8CE;
+    --cream:#FAF6ED; --ivory:#FFFFFF;
+    --sage:#7E9182;
+    --ink:#232B3D; --muted:#5B6478; --line:#E5DAC0;
+    --success:#5E8C61; --success-pale:#E5F0E3;
+    --warning:#C98A2E; --warning-pale:#FBEBD3;
+    --danger:#B5564B; --danger-pale:#F6E3E0;
+    --info:#4D738E; --info-pale:#E2EBF1;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Nunito',sans-serif;color:var(--ink);background:var(--cream);}
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  input,select,textarea{font-family:inherit;}
+  :focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+
+  /* ===== Shell ===== */
+  .app-shell{display:flex;min-height:100vh;}
+
+  .sidebar{
+    width:248px;flex-shrink:0;background:var(--navy);color:#EDE3C8;
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+    transition:transform .25s ease;z-index:60;
+  }
+  .sidebar-brand{display:flex;align-items:center;gap:10px;padding:22px 20px;}
+  .sidebar-brand svg{width:34px;height:34px;flex-shrink:0;}
+  .sidebar-brand span{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:#fff;line-height:1.3;}
+
+  .side-nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:3px;}
+  .nav-item{
+    display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:9px;
+    font-size:14px;font-weight:700;color:#C2CADC;text-align:left;
+    border-left:3px solid transparent;transition:background .2s,color .2s;
+  }
+  .nav-item svg{flex-shrink:0;color:#9AA5C2;transition:color .2s;}
+  .nav-item:hover{background:var(--navy-pale);color:#fff;}
+  .nav-item.active{background:var(--navy-pale);color:#fff;border-left-color:var(--gold);}
+  .nav-item.active svg{color:var(--gold);}
+
+  .sidebar-footer{padding:14px 20px 22px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:4px;}
+  .side-link{display:flex;align-items:center;gap:10px;padding:9px 4px;font-size:13px;font-weight:700;color:#AEB7CA;}
+  .side-link:hover{color:#fff;}
+  .side-link.logout:hover{color:var(--danger);}
+  .side-link svg{flex-shrink:0;}
+
+  .main-area{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:var(--ivory);padding:16px clamp(18px,3vw,34px);
+    border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;
+  }
+  .topbar h1{font-family:'Fraunces',serif;font-weight:700;font-size:22px;color:var(--navy);}
+  .menu-toggle{display:none;color:var(--navy);font-size:20px;}
+  .topbar-user{display:flex;align-items:center;gap:10px;}
+  .topbar-user .user-name{font-size:14px;font-weight:700;color:var(--navy);}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--navy);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;
+  }
+
+  .content{padding:clamp(18px,3vw,34px);max-width:1280px;width:100%;margin:0 auto;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadein .3s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== Stat cards ===== */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:32px;}
+  .stat-card{
+    background:var(--ivory);border-radius:14px;padding:22px 24px;
+    box-shadow:0 6px 18px rgba(30,42,74,.06);
+  }
+  .stat-card .label{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+  .stat-card .value{font-family:'Fraunces',serif;font-size:32px;color:var(--navy);font-weight:700;margin-top:8px;}
+  .stat-card .sub{font-size:12px;color:var(--sage);font-weight:700;margin-top:4px;}
+
+  .two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;}
+  .card{background:var(--ivory);border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(30,42,74,.06);}
+  .card h3{font-family:'Fraunces',serif;font-size:17px;color:var(--navy);margin-bottom:16px;}
+  .mini-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .mini-row:last-child{border-bottom:none;}
+  .mini-row .nm{font-weight:700;color:var(--ink);}
+  .mini-row .meta{color:var(--muted);font-size:12px;}
+
+  /* ===== Toolbar ===== */
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+  .toolbar h2{font-family:'Fraunces',serif;font-size:24px;color:var(--navy);}
+  .toolbar-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .search-box{
+    display:flex;align-items:center;gap:8px;background:var(--ivory);border:1.5px solid var(--line);
+    border-radius:8px;padding:9px 14px;min-width:220px;
+  }
+  .search-box svg{color:var(--muted);flex-shrink:0;}
+  .search-box input{border:none;outline:none;font-size:13px;width:100%;color:var(--ink);background:none;}
+
+  .filter-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .filter-tab{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;color:var(--muted);background:var(--ivory);border:1.5px solid var(--line);}
+  .filter-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  .btn-primary{background:var(--gold);color:var(--navy);font-weight:800;padding:10px 20px;border-radius:8px;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .2s;}
+  .btn-primary:hover{background:var(--gold-deep);transform:translateY(-1px);}
+  .btn-secondary{background:var(--ivory);color:var(--navy);border:1.5px solid var(--line);padding:9px 18px;border-radius:8px;font-weight:700;font-size:13.5px;}
+  .btn-secondary:hover{border-color:var(--navy);}
+
+  /* ===== Table ===== */
+  .table-wrap{background:var(--ivory);border-radius:14px;box-shadow:0 6px 18px rgba(30,42,74,.06);overflow:hidden;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:640px;}
+  thead th{background:var(--navy);color:#EDE3C8;text-align:left;padding:13px 18px;font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+  tbody td{padding:13px 18px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--ink);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover td{background:var(--cream);}
+  .cell-strong{font-weight:700;color:var(--navy);}
+  .cell-muted{color:var(--muted);}
+  .empty-row td{text-align:center;color:var(--muted);padding:36px 18px;font-size:13.5px;}
+
+  .badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:800;white-space:nowrap;}
+  .badge.success{background:var(--success-pale);color:var(--success);}
+  .badge.warning{background:var(--warning-pale);color:var(--warning);}
+  .badge.danger{background:var(--danger-pale);color:var(--danger);}
+  .badge.info{background:var(--info-pale);color:var(--info);}
+
+  .row-actions{display:flex;gap:6px;}
+  .icon-btn{width:30px;height:30px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);}
+  .icon-btn:hover{background:var(--cream);color:var(--navy);}
+  .icon-btn.del:hover{color:var(--danger);}
+  .text-btn{font-size:12px;font-weight:800;padding:6px 12px;border-radius:6px;}
+  .text-btn.accept{background:var(--success-pale);color:var(--success);}
+  .text-btn.accept:hover{background:var(--success);color:#fff;}
+  .text-btn.reject{background:var(--danger-pale);color:var(--danger);}
+  .text-btn.reject:hover{background:var(--danger);color:#fff;}
+
+  /* ===== Modal ===== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(30,42,74,.45);display:none;
+    align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--ivory);border-radius:16px;width:100%;max-width:440px;
+    max-height:90vh;overflow-y:auto;padding:28px;display:none;
+  }
+  .modal-box.show{display:block;}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .modal-head h3{font-family:'Fraunces',serif;font-size:19px;color:var(--navy);}
+  .modal-close{color:var(--muted);width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:var(--cream);color:var(--navy);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:6px;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;
+    font-size:13.5px;color:var(--ink);background:var(--cream);
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold-deep);outline:none;background:var(--ivory);}
+  .field textarea{resize:vertical;min-height:80px;}
+  .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+
+  /* ===== Toast ===== */
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;
+    padding:14px 20px;border-radius:10px;font-size:13.5px;font-weight:700;
+    border-left:4px solid var(--gold);box-shadow:0 10px 26px rgba(30,42,74,.3);
+    transform:translateY(120%);opacity:0;transition:transform .3s ease,opacity .3s ease;z-index:200;
+  }
+  .toast.show{transform:translateY(0);opacity:1;}
+
+  /* ===== Notifikasi Lonceng ===== */
+  .notif-wrap{position:relative;}
+  .notif-btn{
+    width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    color:var(--muted);background:var(--cream);border:1.5px solid var(--line);transition:background .2s,color .2s;
+  }
+  .notif-btn:hover{background:var(--gold-pale);color:var(--navy);}
+  .notif-badge{
+    position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;
+    font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;padding:0 4px;
+    border:2px solid var(--ivory);
+  }
+  .notif-badge.hidden{display:none;}
+  .notif-dropdown{
+    position:absolute;top:calc(100% + 10px);right:0;width:340px;
+    background:var(--ivory);border-radius:14px;border:1.5px solid var(--line);
+    box-shadow:0 12px 32px rgba(30,42,74,.12);z-index:200;display:none;overflow:hidden;
+  }
+  .notif-dropdown.open{display:block;}
+  .notif-drop-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;border-bottom:1px solid var(--line);
+  }
+  .notif-drop-head span{font-size:14px;font-weight:800;color:var(--navy);}
+  .notif-drop-head button{font-size:12px;font-weight:700;color:var(--info);}
+  .notif-list{max-height:300px;overflow-y:auto;}
+  .notif-item{
+    display:flex;align-items:flex-start;gap:12px;padding:13px 18px;
+    border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s;
+  }
+  .notif-item:last-child{border-bottom:none;}
+  .notif-item:hover{background:var(--cream);}
+  .notif-item.unread{background:var(--gold-pale);}
+  .notif-item.unread:hover{background:#EEE0BB;}
+  .notif-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px;}
+  .notif-dot.read{background:transparent;}
+  .notif-item-body{flex:1;min-width:0;}
+  .notif-item-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .notif-item-meta{font-size:11.5px;color:var(--muted);}
+  .notif-empty{padding:28px;text-align:center;font-size:13px;color:var(--muted);}
+
+  /* ===== Panel Pengumuman ===== */
+  .pengumuman-grid{display:grid;gap:16px;}
+  .pengumuman-card{
+    background:var(--ivory);border-radius:14px;padding:20px 24px;
+    box-shadow:0 4px 14px rgba(30,42,74,.06);
+    border-left:4px solid var(--gold);display:flex;gap:16px;align-items:flex-start;
+  }
+  .pengumuman-card.penting{border-left-color:var(--danger);}
+  .pengumuman-card.info{border-left-color:var(--info);}
+  .pengumuman-icon{
+    width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    background:var(--gold-pale);color:var(--gold-deep);
+  }
+  .pengumuman-card.penting .pengumuman-icon{background:var(--danger-pale);color:var(--danger);}
+  .pengumuman-card.info .pengumuman-icon{background:var(--info-pale);color:var(--info);}
+  .pengumuman-body{flex:1;min-width:0;}
+  .pengumuman-judul{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+  .pengumuman-konten{font-size:13.5px;color:var(--ink);line-height:1.6;margin-bottom:8px;}
+  .pengumuman-meta{font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+  .pengumuman-actions{display:flex;gap:6px;flex-shrink:0;}
+
+  @media (max-width:980px){
+    .stat-grid{grid-template-columns:repeat(2,1fr);}
+    .two-col{grid-template-columns:1fr;}
+  }
+  @media (max-width:760px){
+    .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .menu-toggle{display:block;}
+    .stat-grid{grid-template-columns:1fr;}
+    .notif-dropdown{width:290px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Logo">
+        <circle cx="32" cy="32" r="30" fill="#FFFFFF" stroke="#C9A961" stroke-width="2.5"/>
+        <circle cx="24" cy="25" r="7" fill="#1E2A4A"/>
+        <path d="M12 48c0-9 5.5-15 12-15s12 6 12 15" fill="#1E2A4A"/>
+        <circle cx="41" cy="24" r="7" fill="#7E9182"/>
+        <path d="M29 48c0-9.5 5.7-15.5 12-15.5s12 6 12 15.5" fill="#7E9182"/>
+      </svg>
+      <span>KB - TK Mary<br>Anthony</span>
+    </div>
+    <nav class="side-nav">
+      <button class="nav-item active" data-target="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-target="siswa">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.5 2.5-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.3"/><path d="M15.5 13c2.6 0 4.6 2 5 5"/></svg>
+        Data Siswa
+      </button>
+      <button class="nav-item" data-target="guru">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 11v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/><path d="M22 8v6"/></svg>
+        Data Guru
+      </button>
+      <button class="nav-item" data-target="pendaftaran">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M8.5 11h7M8.5 15h7M8.5 19h4"/></svg>
+        Pendaftaran
+      </button>
+      <button class="nav-item" data-target="berita">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="14" height="14" rx="1.5"/><path d="M17 8h4v9a2 2 0 0 1-2 2H5"/><path d="M6.5 8.5h7M6.5 11.5h7M6.5 14.5h4"/></svg>
+        Berita &amp; Event
+      </button>
+      <button class="nav-item" data-target="pengumuman">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Pengumuman
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html" class="side-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9.5a1 1 0 0 0 1 1h3.5v-6h3v6H17a1 1 0 0 0 1-1V10"/></svg>
+        Lihat Website
+      </a>
+      <a href="login.html" class="side-link logout">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M14 16l5-5-5-5"/><path d="M19 11H9"/></svg>
+        Keluar
+      </a>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">&#9776;</button>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-user">
+        <div class="notif-wrap" id="notifWrap">
+          <button class="notif-btn" id="notifBtn" aria-label="Notifikasi pengumuman">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </button>
+          <span class="notif-badge" id="notifBadge">0</span>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-drop-head">
+              <span>Pengumuman Terbaru</span>
+              <button id="btnTandaiSemua">Tandai semua dibaca</button>
+            </div>
+            <div class="notif-list" id="notifList"></div>
+          </div>
+        </div>
+        <span class="user-name">Admin Sekolah</span>
+        <span class="avatar">A</span>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <section class="panel active" id="sec-dashboard">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="label">Total Siswa</div><div class="value" id="statSiswa">0</div><div class="sub">Aktif tahun ajaran ini</div></div>
+          <div class="stat-card"><div class="label">Total Guru</div><div class="value" id="statGuru">0</div><div class="sub">Tenaga pengajar</div></div>
+          <div class="stat-card"><div class="label">Pendaftaran Baru</div><div class="value" id="statPendaftaran">0</div><div class="sub">Menunggu konfirmasi</div></div>
+          <div class="stat-card"><div class="label">Berita Terbit</div><div class="value" id="statBerita">0</div><div class="sub">Sudah dipublikasikan</div></div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3>Pendaftaran Terbaru</h3>
+            <div id="recentPendaftaran"></div>
+          </div>
+          <div class="card">
+            <h3>Berita Terbaru</h3>
+            <div id="recentBerita"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SISWA -->
+      <section class="panel" id="sec-siswa">
+        <div class="toolbar">
+          <h2>Data Siswa</h2>
+          <div class="toolbar-actions">
+            <div class="search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="searchSiswa" placeholder="Cari nama atau kelas...">
+            </div>
+            <button class="btn-primary" id="btnAddSiswa">+ Tambah Siswa</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nama</th><th>Kelas</th><th>Tgl Lahir</th><th>Nama Orang Tua</th><th>No. Telp</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody id="tableSiswa"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- GURU -->
+      <section class="panel" id="sec-guru">
+        <div class="toolbar">
+          <h2>Data Guru</h2>
+          <div class="toolbar-actions">
+            <div class="search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="searchGuru" placeholder="Cari nama guru...">
+            </div>
+            <button class="btn-primary" id="btnAddGuru">+ Tambah Guru</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nama</th><th>NIP</th><th>Kelas Diampu</th><th>Email</th><th>No. Telp</th><th>Aksi</th></tr></thead>
+            <tbody id="tableGuru"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PENDAFTARAN -->
+      <section class="panel" id="sec-pendaftaran">
+        <div class="toolbar">
+          <h2>Pendaftaran Siswa Baru</h2>
+          <div class="toolbar-actions">
+            <button class="btn-secondary" id="btnAddPendaftaran">+ Tambah Manual</button>
+          </div>
+        </div>
+        <div class="filter-tabs" id="filterPendaftaran">
+          <button class="filter-tab active" data-filter="Semua">Semua</button>
+          <button class="filter-tab" data-filter="Pending">Pending</button>
+          <button class="filter-tab" data-filter="Diterima">Diterima</button>
+          <button class="filter-tab" data-filter="Ditolak">Ditolak</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nama Calon Siswa</th><th>Nama Orang Tua</th><th>Tgl Daftar</th><th>No. Telp</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody id="tablePendaftaran"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- BERITA -->
+      <section class="panel" id="sec-berita">
+        <div class="toolbar">
+          <h2>Berita &amp; Event</h2>
+          <div class="toolbar-actions">
+            <div class="search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="searchBerita" placeholder="Cari judul berita...">
+            </div>
+            <button class="btn-primary" id="btnAddBerita">+ Tambah Berita</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Judul</th><th>Kategori</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody id="tableBerita"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PENGUMUMAN -->
+      <section class="panel" id="sec-pengumuman">
+        <div class="toolbar">
+          <h2>Pengumuman</h2>
+          <div class="toolbar-actions">
+            <div class="search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="searchPengumuman" placeholder="Cari pengumuman...">
+            </div>
+            <button class="btn-primary" id="btnAddPengumuman">+ Buat Pengumuman</button>
+          </div>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-pfilter="Semua">Semua</button>
+          <button class="filter-tab" data-pfilter="Umum">Umum</button>
+          <button class="filter-tab" data-pfilter="Penting">Penting</button>
+          <button class="filter-tab" data-pfilter="Info">Info</button>
+        </div>
+        <div class="pengumuman-grid" id="pengumumanGrid"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalOverlay">
+
+  <div class="modal-box" id="modalSiswa">
+    <div class="modal-head"><h3 id="modalSiswaTitle">Tambah Siswa</h3>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form id="formSiswa">
+      <input type="hidden" id="siswaId">
+      <div class="field"><label>Nama Lengkap</label><input type="text" id="siswaNama" required></div>
+      <div class="field"><label>Kelas</label>
+        <select id="siswaKelas" required>
+          <option>TK A1</option><option>TK A2</option><option>TK B1</option><option>TK B2</option>
+        </select>
+      </div>
+      <div class="field"><label>Tanggal Lahir</label><input type="date" id="siswaTgl" required></div>
+      <div class="field"><label>Nama Orang Tua</label><input type="text" id="siswaOrtu" required></div>
+      <div class="field"><label>No. Telp Orang Tua</label><input type="text" id="siswaTelp" required></div>
+      <div class="field"><label>Status</label>
+        <select id="siswaStatus"><option>Aktif</option><option>Nonaktif</option></select>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn-secondary" data-close>Batal</button>
+        <button type="submit" class="btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-box" id="modalGuru">
+    <div class="modal-head"><h3 id="modalGuruTitle">Tambah Guru</h3>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form id="formGuru">
+      <input type="hidden" id="guruId">
+      <div class="field"><label>Nama Lengkap</label><input type="text" id="guruNama" required></div>
+      <div class="field"><label>NIP</label><input type="text" id="guruNip" required></div>
+      <div class="field"><label>Kelas Diampu</label>
+        <select id="guruKelas" required>
+          <option>TK A1</option><option>TK A2</option><option>TK B1</option><option>TK B2</option><option>Pendamping</option>
+        </select>
+      </div>
+      <div class="field"><label>Email</label><input type="text" id="guruEmail" required></div>
+      <div class="field"><label>No. Telp</label><input type="text" id="guruTelp" required></div>
+      <div class="modal-foot">
+        <button type="button" class="btn-secondary" data-close>Batal</button>
+        <button type="submit" class="btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-box" id="modalPendaftaran">
+    <div class="modal-head"><h3>Tambah Pendaftaran Manual</h3>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form id="formPendaftaran">
+      <div class="field"><label>Nama Calon Siswa</label><input type="text" id="pendaftaranNama" required></div>
+      <div class="field"><label>Nama Orang Tua</label><input type="text" id="pendaftaranOrtu" required></div>
+      <div class="field"><label>Tanggal Daftar</label><input type="date" id="pendaftaranTgl" required></div>
+      <div class="field"><label>No. Telp</label><input type="text" id="pendaftaranTelp" required></div>
+      <div class="modal-foot">
+        <button type="button" class="btn-secondary" data-close>Batal</button>
+        <button type="submit" class="btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-box" id="modalBerita">
+    <div class="modal-head"><h3 id="modalBeritaTitle">Tambah Berita</h3>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form id="formBerita">
+      <input type="hidden" id="beritaId">
+      <div class="field"><label>Judul</label><input type="text" id="beritaJudul" required></div>
+      <div class="field"><label>Kategori</label>
+        <select id="beritaKategori">
+          <option>School Event</option><option>Academics</option><option>Admissions</option><option>Pengumuman</option>
+        </select>
+      </div>
+      <div class="field"><label>Tanggal</label><input type="date" id="beritaTgl" required></div>
+      <div class="field"><label>Ringkasan</label><textarea id="beritaKonten" placeholder="Tulis ringkasan singkat berita..."></textarea></div>
+      <div class="field"><label>Status</label>
+        <select id="beritaStatus"><option>Published</option><option>Draft</option></select>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn-secondary" data-close>Batal</button>
+        <button type="submit" class="btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-box" id="modalPengumuman">
+    <div class="modal-head"><h3 id="modalPengumumanTitle">Buat Pengumuman</h3>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form id="formPengumuman">
+      <input type="hidden" id="pengumumanId">
+      <div class="field"><label>Judul Pengumuman</label><input type="text" id="pengumumanJudul" placeholder="Tulis judul pengumuman..." required></div>
+      <div class="field"><label>Isi Pengumuman</label><textarea id="pengumumanKonten" placeholder="Tulis isi pengumuman secara lengkap..." style="min-height:100px;" required></textarea></div>
+      <div class="field"><label>Kategori</label>
+        <select id="pengumumanKategori">
+          <option value="Umum">Umum</option>
+          <option value="Penting">Penting</option>
+          <option value="Info">Info</option>
+        </select>
+      </div>
+      <div class="field"><label>Ditujukan Untuk</label>
+        <select id="pengumumanTarget">
+          <option value="Semua">Semua (Admin, Guru &amp; Orang Tua)</option>
+          <option value="Guru">Guru</option>
+          <option value="Orang Tua">Orang Tua</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div class="field"><label>Tanggal</label><input type="date" id="pengumumanTgl" required></div>
+      <div class="modal-foot">
+        <button type="button" class="btn-secondary" data-close>Batal</button>
+        <button type="submit" class="btn-primary">Kirim Pengumuman</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ Mock data ============ */
+let siswaData = [
+  {id:1, nama:'Keanu Aditya', kelas:'TK A1', tgl:'2021-03-12', ortu:'Bapak Aditya Pratama', telp:'0812-1111-0001', status:'Aktif'},
+  {id:2, nama:'Bilqis Ramadhani', kelas:'TK A1', tgl:'2021-05-22', ortu:'Ibu Sari Ramadhani', telp:'0812-1111-0002', status:'Aktif'},
+  {id:3, nama:'Arka Saputra', kelas:'TK A2', tgl:'2021-01-09', ortu:'Bapak Eko Saputra', telp:'0812-1111-0003', status:'Aktif'},
+  {id:4, nama:'Naila Putri', kelas:'TK A2', tgl:'2021-07-18', ortu:'Ibu Maya Putri', telp:'0812-1111-0004', status:'Aktif'},
+  {id:5, nama:'Raffi Wijaya', kelas:'TK B1', tgl:'2020-09-04', ortu:'Bapak Hendra Wijaya', telp:'0812-1111-0005', status:'Aktif'},
+  {id:6, nama:'Zahra Amelia', kelas:'TK B1', tgl:'2020-11-30', ortu:'Ibu Lestari Amelia', telp:'0812-1111-0006', status:'Aktif'},
+  {id:7, nama:'Dimas Pratama', kelas:'TK B2', tgl:'2020-02-14', ortu:'Bapak Yoga Pratama', telp:'0812-1111-0007', status:'Aktif'},
+  {id:8, nama:'Citra Lestari', kelas:'TK B2', tgl:'2020-12-25', ortu:'Ibu Wulan Lestari', telp:'0812-1111-0008', status:'Nonaktif'},
+];
+let guruData = [
+  {id:1, nama:'Siti Rahmawati, S.Pd', nip:'198501012010012001', kelas:'TK A1', email:'siti.rahmawati@tkmaryanthony.sch.id', telp:'0813-2222-0001'},
+  {id:2, nama:'Budi Santoso, S.Pd', nip:'198703152011011002', kelas:'TK A2', email:'budi.santoso@tkmaryanthony.sch.id', telp:'0813-2222-0002'},
+  {id:3, nama:'Ani Wulandari, S.Pd', nip:'199002202012012003', kelas:'TK B1', email:'ani.wulandari@tkmaryanthony.sch.id', telp:'0813-2222-0003'},
+  {id:4, nama:'Dewi Anggraini, S.Pd', nip:'199105102013012004', kelas:'TK B2', email:'dewi.anggraini@tkmaryanthony.sch.id', telp:'0813-2222-0004'},
+  {id:5, nama:'Rina Kusuma, S.Pd', nip:'199306182014012005', kelas:'Pendamping', email:'rina.kusuma@tkmaryanthony.sch.id', telp:'0813-2222-0005'},
+];
+let pendaftaranData = [
+  {id:1, nama:'Aisyah Salsabila', ortu:'Ibu Fitri Salsabila', tgl:'2026-06-10', telp:'0815-3333-0001', status:'Pending'},
+  {id:2, nama:'Farrel Nugroho', ortu:'Bapak Bayu Nugroho', tgl:'2026-06-09', telp:'0815-3333-0002', status:'Pending'},
+  {id:3, nama:'Kirana Maheswari', ortu:'Ibu Dian Maheswari', tgl:'2026-06-08', telp:'0815-3333-0003', status:'Diterima'},
+  {id:4, nama:'Bagas Wicaksono', ortu:'Bapak Fajar Wicaksono', tgl:'2026-06-05', telp:'0815-3333-0004', status:'Pending'},
+  {id:5, nama:'Putri Anggita', ortu:'Ibu Sinta Anggita', tgl:'2026-06-02', telp:'0815-3333-0005', status:'Ditolak'},
+  {id:6, nama:'Yusuf Hidayat', ortu:'Bapak Rudi Hidayat', tgl:'2026-05-28', telp:'0815-3333-0006', status:'Diterima'},
+];
+let beritaData = [
+  {id:1, judul:'Bazar Amal Tahunan Sukses Digelar', kategori:'School Event', tgl:'2026-05-12', konten:'Keluarga dan anak-anak berkumpul untuk berbagai permainan dan jajanan buatan sendiri.', status:'Published'},
+  {id:2, judul:'Menyambut Semester Baru yang Penuh Rasa Ingin Tahu', kategori:'Academics', tgl:'2026-05-02', konten:'Tema semester ini meliputi eksplorasi alam, literasi awal, dan bermain angka.', status:'Published'},
+  {id:3, judul:'Open House Penerimaan Murid Baru 2026/2027', kategori:'Admissions', tgl:'2026-04-20', konten:'Calon orang tua diundang untuk berkeliling kelas dan bertemu tim pengajar kami.', status:'Published'},
+  {id:4, judul:'Jadwal Libur Semester Ganjil', kategori:'Pengumuman', tgl:'2026-06-01', konten:'Informasi jadwal libur dan kegiatan menjelang semester baru.', status:'Draft'},
+  {id:5, judul:'Lomba Mewarnai Tingkat TK Se-Kecamatan', kategori:'School Event', tgl:'2026-06-15', konten:'Pendaftaran lomba mewarnai dibuka untuk seluruh siswa TK B.', status:'Draft'},
+];
+
+let pengumumanData = [
+  {id:1, judul:'Libur Hari Raya Idul Adha 1447 H', konten:'Diberitahukan kepada seluruh warga sekolah bahwa KB-TK Mary Anthony akan libur pada tanggal 6–7 Juni 2026 dalam rangka peringatan Hari Raya Idul Adha 1447 H. Kegiatan belajar mengajar akan kembali normal pada 8 Juni 2026.', kategori:'Penting', target:'Semua', tgl:'2026-06-01', dibaca:false},
+  {id:2, judul:'Pengumpulan Rapor Semester Genap', konten:'Mohon kepada seluruh wali kelas untuk mengumpulkan nilai rapor semester genap paling lambat tanggal 20 Juni 2026 kepada bagian administrasi sekolah.', kategori:'Info', target:'Guru', tgl:'2026-06-05', dibaca:false},
+  {id:3, judul:'Kegiatan Pentas Seni Akhir Tahun', konten:'KB-TK Mary Anthony akan menyelenggarakan Pentas Seni Akhir Tahun pada 28 Juni 2026. Seluruh orang tua/wali murid diundang untuk hadir dan menyaksikan penampilan putra-putri terbaik mereka.', kategori:'Umum', target:'Semua', tgl:'2026-06-10', dibaca:true},
+];
+let nextId = {siswa:9, guru:6, pendaftaran:7, berita:6, pengumuman:4};
+let pengumumanFilter = 'Semua';
+let pendaftaranFilter = 'Semua';
+
+/* ============ Helpers ============ */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function fmtDate(d){
+  if(!d) return '-';
+  const dt = new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
+}
+function openModal(id){
+  document.getElementById('modalOverlay').classList.add('show');
+  document.querySelectorAll('.modal-box').forEach(m=>m.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.querySelectorAll('.modal-box').forEach(m=>m.classList.remove('show'));
+}
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', closeModal));
+document.getElementById('modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+/* ============ Navigation ============ */
+const navItems = document.querySelectorAll('.nav-item');
+const panels = document.querySelectorAll('.panel');
+const titles = {dashboard:'Dashboard', siswa:'Data Siswa', guru:'Data Guru', pendaftaran:'Pendaftaran Siswa Baru', berita:'Berita & Event', pengumuman:'Pengumuman'};
+navItems.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    navItems.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    panels.forEach(p=>p.classList.remove('active'));
+    document.getElementById('sec-'+btn.dataset.target).classList.add('active');
+    document.getElementById('pageTitle').textContent = titles[btn.dataset.target];
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+document.getElementById('menuToggle').addEventListener('click', ()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+/* ============ Renderers ============ */
+function renderDashboard(){
+  document.getElementById('statSiswa').textContent = siswaData.filter(s=>s.status==='Aktif').length;
+  document.getElementById('statGuru').textContent = guruData.length;
+  document.getElementById('statPendaftaran').textContent = pendaftaranData.filter(p=>p.status==='Pending').length;
+  document.getElementById('statBerita').textContent = beritaData.filter(b=>b.status==='Published').length;
+
+  const rp = document.getElementById('recentPendaftaran');
+  rp.innerHTML = pendaftaranData.slice(-4).reverse().map(p=>`
+    <div class="mini-row">
+      <div><div class="nm">${p.nama}</div><div class="meta">${fmtDate(p.tgl)}</div></div>
+      <span class="badge ${badgeClassPendaftaran(p.status)}">${p.status}</span>
+    </div>`).join('') || '<p class="meta">Belum ada data.</p>';
+
+  const rb = document.getElementById('recentBerita');
+  rb.innerHTML = beritaData.slice(-3).reverse().map(b=>`
+    <div class="mini-row">
+      <div><div class="nm">${b.judul}</div><div class="meta">${b.kategori} · ${fmtDate(b.tgl)}</div></div>
+      <span class="badge ${b.status==='Published'?'success':'muted'}" style="${b.status!=='Published'?'background:#EEE;color:#5B6478;':''}">${b.status}</span>
+    </div>`).join('') || '<p class="meta">Belum ada data.</p>';
+}
+
+function badgeClassPendaftaran(s){
+  return s==='Diterima' ? 'success' : s==='Ditolak' ? 'danger' : 'warning';
+}
+
+function renderSiswa(){
+  const q = document.getElementById('searchSiswa').value.trim().toLowerCase();
+  const filtered = siswaData.filter(s => s.nama.toLowerCase().includes(q) || s.kelas.toLowerCase().includes(q));
+  const tb = document.getElementById('tableSiswa');
+  tb.innerHTML = filtered.map(s=>`
+    <tr>
+      <td class="cell-strong">${s.nama}</td>
+      <td>${s.kelas}</td>
+      <td class="cell-muted">${fmtDate(s.tgl)}</td>
+      <td>${s.ortu}</td>
+      <td class="cell-muted">${s.telp}</td>
+      <td><span class="badge ${s.status==='Aktif'?'success':'danger'}">${s.status}</span></td>
+      <td><div class="row-actions">
+        <button class="icon-btn" onclick="editSiswa(${s.id})" aria-label="Edit ${s.nama}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17.5V20h2.5l11-11-2.5-2.5-11 11Z"/><path d="M14 5l2.5 2.5"/></svg></button>
+        <button class="icon-btn del" onclick="deleteSiswa(${s.id})" aria-label="Hapus ${s.nama}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/></svg></button>
+      </div></td>
+    </tr>`).join('') || `<tr class="empty-row"><td colspan="7">Tidak ada data yang cocok.</td></tr>`;
+}
+
+function renderGuru(){
+  const q = document.getElementById('searchGuru').value.trim().toLowerCase();
+  const filtered = guruData.filter(g => g.nama.toLowerCase().includes(q));
+  const tb = document.getElementById('tableGuru');
+  tb.innerHTML = filtered.map(g=>`
+    <tr>
+      <td class="cell-strong">${g.nama}</td>
+      <td class="cell-muted">${g.nip}</td>
+      <td>${g.kelas}</td>
+      <td class="cell-muted">${g.email}</td>
+      <td class="cell-muted">${g.telp}</td>
+      <td><div class="row-actions">
+        <button class="icon-btn" onclick="editGuru(${g.id})" aria-label="Edit ${g.nama}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17.5V20h2.5l11-11-2.5-2.5-11 11Z"/><path d="M14 5l2.5 2.5"/></svg></button>
+        <button class="icon-btn del" onclick="deleteGuru(${g.id})" aria-label="Hapus ${g.nama}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/></svg></button>
+      </div></td>
+    </tr>`).join('') || `<tr class="empty-row"><td colspan="6">Tidak ada data yang cocok.</td></tr>`;
+}
+
+function renderPendaftaran(){
+  const filtered = pendaftaranFilter==='Semua' ? pendaftaranData : pendaftaranData.filter(p=>p.status===pendaftaranFilter);
+  const tb = document.getElementById('tablePendaftaran');
+  tb.innerHTML = filtered.map(p=>`
+    <tr>
+      <td class="cell-strong">${p.nama}</td>
+      <td>${p.ortu}</td>
+      <td class="cell-muted">${fmtDate(p.tgl)}</td>
+      <td class="cell-muted">${p.telp}</td>
+      <td><span class="badge ${badgeClassPendaftaran(p.status)}">${p.status}</span></td>
+      <td><div class="row-actions">
+        <button class="text-btn accept" onclick="setPendaftaranStatus(${p.id},'Diterima')">Terima</button>
+        <button class="text-btn reject" onclick="setPendaftaranStatus(${p.id},'Ditolak')">Tolak</button>
+      </div></td>
+    </tr>`).join('') || `<tr class="empty-row"><td colspan="6">Tidak ada data untuk filter ini.</td></tr>`;
+}
+
+function renderBerita(){
+  const q = document.getElementById('searchBerita').value.trim().toLowerCase();
+  const filtered = beritaData.filter(b => b.judul.toLowerCase().includes(q));
+  const tb = document.getElementById('tableBerita');
+  tb.innerHTML = filtered.map(b=>`
+    <tr>
+      <td class="cell-strong">${b.judul}</td>
+      <td>${b.kategori}</td>
+      <td class="cell-muted">${fmtDate(b.tgl)}</td>
+      <td><span class="badge ${b.status==='Published'?'success':'warning'}">${b.status}</span></td>
+      <td><div class="row-actions">
+        <button class="icon-btn" onclick="editBerita(${b.id})" aria-label="Edit ${b.judul}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17.5V20h2.5l11-11-2.5-2.5-11 11Z"/><path d="M14 5l2.5 2.5"/></svg></button>
+        <button class="icon-btn del" onclick="deleteBerita(${b.id})" aria-label="Hapus ${b.judul}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/></svg></button>
+      </div></td>
+    </tr>`).join('') || `<tr class="empty-row"><td colspan="5">Tidak ada data yang cocok.</td></tr>`;
+}
+
+function renderAll(){
+  renderDashboard(); renderSiswa(); renderGuru(); renderPendaftaran(); renderBerita(); renderPengumuman(); renderNotifDropdown();
+}
+
+/* ============ Pengumuman ============ */
+function pengumumanCardClass(k){ return k==='Penting'?'penting':k==='Info'?'info':''; }
+function pengumumanIconSvg(k){
+  if(k==='Penting') return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>';
+  if(k==='Info') return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></svg>';
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+}
+function renderPengumuman(){
+  const q = document.getElementById('searchPengumuman').value.trim().toLowerCase();
+  let filtered = pengumumanData.filter(p => p.judul.toLowerCase().includes(q) || p.konten.toLowerCase().includes(q));
+  if(pengumumanFilter !== 'Semua') filtered = filtered.filter(p => p.kategori === pengumumanFilter);
+  filtered = [...filtered].reverse();
+  const grid = document.getElementById('pengumumanGrid');
+  if(!filtered.length){
+    grid.innerHTML = '<p style="color:var(--muted);font-size:14px;padding:20px 0;">Tidak ada pengumuman ditemukan.</p>';
+    return;
+  }
+  grid.innerHTML = filtered.map(p=>`
+    <div class="pengumuman-card ${pengumumanCardClass(p.kategori)}">
+      <div class="pengumuman-icon">${pengumumanIconSvg(p.kategori)}</div>
+      <div class="pengumuman-body">
+        <div class="pengumuman-judul">${p.judul}</div>
+        <div class="pengumuman-konten">${p.konten}</div>
+        <div class="pengumuman-meta">
+          <span class="badge ${p.kategori==='Penting'?'danger':p.kategori==='Info'?'info':'warning'}">${p.kategori}</span>
+          <span>Untuk: ${p.target}</span>
+          <span>${fmtDate(p.tgl)}</span>
+        </div>
+      </div>
+      <div class="pengumuman-actions">
+        <button class="icon-btn" onclick="editPengumuman(${p.id})" aria-label="Edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17.5V20h2.5l11-11-2.5-2.5-11 11Z"/><path d="M14 5l2.5 2.5"/></svg></button>
+        <button class="icon-btn del" onclick="deletePengumuman(${p.id})" aria-label="Hapus"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/></svg></button>
+      </div>
+    </div>`).join('');
+}
+
+function renderNotifDropdown(){
+  const unread = pengumumanData.filter(p=>!p.dibaca);
+  const badge = document.getElementById('notifBadge');
+  badge.textContent = unread.length;
+  badge.classList.toggle('hidden', unread.length===0);
+  const list = document.getElementById('notifList');
+  const sorted = [...pengumumanData].reverse();
+  if(!sorted.length){ list.innerHTML='<div class="notif-empty">Belum ada pengumuman.</div>'; return; }
+  list.innerHTML = sorted.map(p=>`
+    <div class="notif-item ${p.dibaca?'':'unread'}" onclick="tandaiDibaca(${p.id})">
+      <div class="notif-dot ${p.dibaca?'read':''}"></div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">${p.judul}</div>
+        <div class="notif-item-meta">${p.kategori} · ${p.target} · ${fmtDate(p.tgl)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function tandaiDibaca(id){
+  const p = pengumumanData.find(x=>x.id===id);
+  if(p) p.dibaca = true;
+  renderNotifDropdown();
+}
+
+document.getElementById('btnTandaiSemua').addEventListener('click', ()=>{
+  pengumumanData.forEach(p=>p.dibaca=true);
+  renderNotifDropdown();
+  toast('Semua pengumuman ditandai dibaca.');
+});
+
+document.getElementById('notifBtn').addEventListener('click', e=>{
+  e.stopPropagation();
+  document.getElementById('notifDropdown').classList.toggle('open');
+});
+document.addEventListener('click', e=>{
+  if(!document.getElementById('notifWrap').contains(e.target)){
+    document.getElementById('notifDropdown').classList.remove('open');
+  }
+});
+
+document.getElementById('btnAddPengumuman').addEventListener('click', ()=>{
+  document.getElementById('formPengumuman').reset();
+  document.getElementById('pengumumanId').value = '';
+  document.getElementById('pengumumanTgl').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modalPengumumanTitle').textContent = 'Buat Pengumuman';
+  openModal('modalPengumuman');
+});
+
+function editPengumuman(id){
+  const p = pengumumanData.find(x=>x.id===id);
+  document.getElementById('pengumumanId').value = p.id;
+  document.getElementById('pengumumanJudul').value = p.judul;
+  document.getElementById('pengumumanKonten').value = p.konten;
+  document.getElementById('pengumumanKategori').value = p.kategori;
+  document.getElementById('pengumumanTarget').value = p.target;
+  document.getElementById('pengumumanTgl').value = p.tgl;
+  document.getElementById('modalPengumumanTitle').textContent = 'Edit Pengumuman';
+  openModal('modalPengumuman');
+}
+
+function deletePengumuman(id){
+  const p = pengumumanData.find(x=>x.id===id);
+  if(!confirm(`Hapus pengumuman "${p.judul}"?`)) return;
+  pengumumanData = pengumumanData.filter(x=>x.id!==id);
+  renderAll();
+  toast('Pengumuman dihapus.');
+}
+
+document.getElementById('formPengumuman').addEventListener('submit', e=>{
+  e.preventDefault();
+  const id = document.getElementById('pengumumanId').value;
+  const payload = {
+    judul: document.getElementById('pengumumanJudul').value.trim(),
+    konten: document.getElementById('pengumumanKonten').value.trim(),
+    kategori: document.getElementById('pengumumanKategori').value,
+    target: document.getElementById('pengumumanTarget').value,
+    tgl: document.getElementById('pengumumanTgl').value,
+    dibaca: false,
+  };
+  if(id){
+    Object.assign(pengumumanData.find(x=>x.id==id), payload);
+    toast('Pengumuman diperbarui.');
+  } else {
+    pengumumanData.push({id: nextId.pengumuman++, ...payload});
+    toast('Pengumuman berhasil dikirim!');
+  }
+  closeModal(); renderAll();
+});
+
+document.querySelectorAll('[data-pfilter]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-pfilter]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    pengumumanFilter = btn.dataset.pfilter;
+    renderPengumuman();
+  });
+});
+
+document.getElementById('searchPengumuman').addEventListener('input', renderPengumuman);
+
+/* ============ Siswa CRUD ============ */
+document.getElementById('btnAddSiswa').addEventListener('click', ()=>{
+  document.getElementById('formSiswa').reset();
+  document.getElementById('siswaId').value = '';
+  document.getElementById('modalSiswaTitle').textContent = 'Tambah Siswa';
+  openModal('modalSiswa');
+});
+function editSiswa(id){
+  const s = siswaData.find(x=>x.id===id);
+  document.getElementById('siswaId').value = s.id;
+  document.getElementById('siswaNama').value = s.nama;
+  document.getElementById('siswaKelas').value = s.kelas;
+  document.getElementById('siswaTgl').value = s.tgl;
+  document.getElementById('siswaOrtu').value = s.ortu;
+  document.getElementById('siswaTelp').value = s.telp;
+  document.getElementById('siswaStatus').value = s.status;
+  document.getElementById('modalSiswaTitle').textContent = 'Edit Siswa';
+  openModal('modalSiswa');
+}
+function deleteSiswa(id){
+  const s = siswaData.find(x=>x.id===id);
+  if(!confirm(`Hapus data siswa "${s.nama}"?`)) return;
+  siswaData = siswaData.filter(x=>x.id!==id);
+  renderAll();
+  toast('Data siswa dihapus.');
+}
+document.getElementById('formSiswa').addEventListener('submit', e=>{
+  e.preventDefault();
+  const id = document.getElementById('siswaId').value;
+  const payload = {
+    nama: document.getElementById('siswaNama').value.trim(),
+    kelas: document.getElementById('siswaKelas').value,
+    tgl: document.getElementById('siswaTgl').value,
+    ortu: document.getElementById('siswaOrtu').value.trim(),
+    telp: document.getElementById('siswaTelp').value.trim(),
+    status: document.getElementById('siswaStatus').value,
+  };
+  if(id){
+    Object.assign(siswaData.find(x=>x.id==id), payload);
+    toast('Data siswa diperbarui.');
+  } else {
+    siswaData.push({id: nextId.siswa++, ...payload});
+    toast('Siswa baru ditambahkan.');
+  }
+  closeModal(); renderAll();
+});
+
+/* ============ Guru CRUD ============ */
+document.getElementById('btnAddGuru').addEventListener('click', ()=>{
+  document.getElementById('formGuru').reset();
+  document.getElementById('guruId').value = '';
+  document.getElementById('modalGuruTitle').textContent = 'Tambah Guru';
+  openModal('modalGuru');
+});
+function editGuru(id){
+  const g = guruData.find(x=>x.id===id);
+  document.getElementById('guruId').value = g.id;
+  document.getElementById('guruNama').value = g.nama;
+  document.getElementById('guruNip').value = g.nip;
+  document.getElementById('guruKelas').value = g.kelas;
+  document.getElementById('guruEmail').value = g.email;
+  document.getElementById('guruTelp').value = g.telp;
+  document.getElementById('modalGuruTitle').textContent = 'Edit Guru';
+  openModal('modalGuru');
+}
+function deleteGuru(id){
+  const g = guruData.find(x=>x.id===id);
+  if(!confirm(`Hapus data guru "${g.nama}"?`)) return;
+  guruData = guruData.filter(x=>x.id!==id);
+  renderAll();
+  toast('Data guru dihapus.');
+}
+document.getElementById('formGuru').addEventListener('submit', e=>{
+  e.preventDefault();
+  const id = document.getElementById('guruId').value;
+  const payload = {
+    nama: document.getElementById('guruNama').value.trim(),
+    nip: document.getElementById('guruNip').value.trim(),
+    kelas: document.getElementById('guruKelas').value,
+    email: document.getElementById('guruEmail').value.trim(),
+    telp: document.getElementById('guruTelp').value.trim(),
+  };
+  if(id){
+    Object.assign(guruData.find(x=>x.id==id), payload);
+    toast('Data guru diperbarui.');
+  } else {
+    guruData.push({id: nextId.guru++, ...payload});
+    toast('Guru baru ditambahkan.');
+  }
+  closeModal(); renderAll();
+});
+
+/* ============ Pendaftaran ============ */
+document.getElementById('filterPendaftaran').addEventListener('click', e=>{
+  const btn = e.target.closest('.filter-tab');
+  if(!btn) return;
+  document.querySelectorAll('#filterPendaftaran .filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  pendaftaranFilter = btn.dataset.filter;
+  renderPendaftaran();
+});
+function setPendaftaranStatus(id, status){
+  const p = pendaftaranData.find(x=>x.id===id);
+  p.status = status;
+  renderAll();
+  toast(`Pendaftaran ${p.nama} ditandai "${status}".`);
+}
+document.getElementById('btnAddPendaftaran').addEventListener('click', ()=>{
+  document.getElementById('formPendaftaran').reset();
+  openModal('modalPendaftaran');
+});
+document.getElementById('formPendaftaran').addEventListener('submit', e=>{
+  e.preventDefault();
+  pendaftaranData.push({
+    id: nextId.pendaftaran++,
+    nama: document.getElementById('pendaftaranNama').value.trim(),
+    ortu: document.getElementById('pendaftaranOrtu').value.trim(),
+    tgl: document.getElementById('pendaftaranTgl').value,
+    telp: document.getElementById('pendaftaranTelp').value.trim(),
+    status: 'Pending',
+  });
+  closeModal(); renderAll();
+  toast('Pendaftaran baru ditambahkan.');
+});
+
+/* ============ Berita CRUD ============ */
+document.getElementById('btnAddBerita').addEventListener('click', ()=>{
+  document.getElementById('formBerita').reset();
+  document.getElementById('beritaId').value = '';
+  document.getElementById('modalBeritaTitle').textContent = 'Tambah Berita';
+  openModal('modalBerita');
+});
+function editBerita(id){
+  const b = beritaData.find(x=>x.id===id);
+  document.getElementById('beritaId').value = b.id;
+  document.getElementById('beritaJudul').value = b.judul;
+  document.getElementById('beritaKategori').value = b.kategori;
+  document.getElementById('beritaTgl').value = b.tgl;
+  document.getElementById('beritaKonten').value = b.konten;
+  document.getElementById('beritaStatus').value = b.status;
+  document.getElementById('modalBeritaTitle').textContent = 'Edit Berita';
+  openModal('modalBerita');
+}
+function deleteBerita(id){
+  const b = beritaData.find(x=>x.id===id);
+  if(!confirm(`Hapus berita "${b.judul}"?`)) return;
+  beritaData = beritaData.filter(x=>x.id!==id);
+  renderAll();
+  toast('Berita dihapus.');
+}
+document.getElementById('formBerita').addEventListener('submit', e=>{
+  e.preventDefault();
+  const id = document.getElementById('beritaId').value;
+  const payload = {
+    judul: document.getElementById('beritaJudul').value.trim(),
+    kategori: document.getElementById('beritaKategori').value,
+    tgl: document.getElementById('beritaTgl').value,
+    konten: document.getElementById('beritaKonten').value.trim(),
+    status: document.getElementById('beritaStatus').value,
+  };
+  if(id){
+    Object.assign(beritaData.find(x=>x.id==id), payload);
+    toast('Berita diperbarui.');
+  } else {
+    beritaData.push({id: nextId.berita++, ...payload});
+    toast('Berita baru ditambahkan.');
+  }
+  closeModal(); renderAll();
+});
+
+/* ============ Search listeners ============ */
+document.getElementById('searchSiswa').addEventListener('input', renderSiswa);
+document.getElementById('searchGuru').addEventListener('input', renderGuru);
+document.getElementById('searchBerita').addEventListener('input', renderBerita);
+
+/* ============ Init ============ */
+renderAll();
+</script>
+</body>
+</html>

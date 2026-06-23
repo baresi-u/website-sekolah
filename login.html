@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - KB TK Mary Anthony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1E2A4A; --navy-soft:#2E3F66;
+    --gold:#C9A961; --gold-deep:#AD8A47; --gold-pale:#F3E8CE;
+    --cream:#FAF6ED; --ivory:#FFFFFF;
+    --sage:#7E9182;
+    --ink:#232B3D; --muted:#5B6478; --line:#E5DAC0;
+    --danger:#B5564B; --danger-pale:#F6E3E0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Nunito',sans-serif;color:var(--ink);background:var(--cream);}
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  :focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+
+  .login-shell{min-height:100vh;display:flex;}
+
+  /* ---- Left decorative panel ---- */
+  .login-aside{
+    flex:1 1 46%;background:linear-gradient(155deg,var(--navy) 0%,var(--navy-soft) 100%);
+    color:#fff;position:relative;overflow:hidden;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(36px,6vw,80px);
+  }
+  .login-aside::before{
+    content:"";position:absolute;right:-90px;top:-90px;width:280px;height:280px;
+    border-radius:50%;background:radial-gradient(circle,rgba(201,169,97,.30),transparent 70%);
+  }
+  .login-aside::after{
+    content:"";position:absolute;left:-15%;bottom:-18%;width:80%;height:60%;
+    background:var(--sage);opacity:.18;border-radius:50% 50% 0 0/100% 100% 0 0;
+  }
+  .brand-mini{display:flex;align-items:center;gap:12px;position:relative;z-index:2;margin-bottom:auto;}
+  .brand-mini svg{width:38px;height:38px;flex-shrink:0;}
+  .brand-mini span{font-weight:800;letter-spacing:1px;font-size:14px;color:var(--gold-pale);text-transform:uppercase;}
+  .aside-copy{position:relative;z-index:2;margin-top:60px;max-width:420px;}
+  .aside-copy .eyebrow{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;}
+  .aside-copy h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(30px,3.6vw,44px);margin:14px 0 18px;line-height:1.15;}
+  .aside-copy p{font-size:15px;line-height:1.7;color:#C7CEDD;}
+  .aside-foot{position:relative;z-index:2;font-size:13px;color:#8E97AE;margin-top:50px;}
+
+  /* ---- Right form panel ---- */
+  .login-main{
+    flex:1 1 54%;display:flex;align-items:center;justify-content:center;
+    padding:40px 24px;
+  }
+  .login-card{width:100%;max-width:400px;}
+  .login-card h2{font-family:'Fraunces',serif;font-weight:700;font-size:28px;color:var(--navy);}
+  .login-card .sub{font-size:14px;color:var(--muted);margin-top:6px;margin-bottom:26px;}
+
+  .role-toggle{
+    position:relative;display:flex;background:var(--gold-pale);border-radius:10px;
+    padding:4px;margin-bottom:26px;
+  }
+  .role-indicator{
+    position:absolute;top:4px;left:4px;width:calc(50% - 4px);height:calc(100% - 8px);
+    background:var(--navy);border-radius:7px;transition:transform .25s ease;
+  }
+  .role-btn{
+    position:relative;z-index:2;flex:1;padding:10px 0;font-weight:700;font-size:14px;
+    color:var(--navy-soft);border-radius:7px;transition:color .25s ease;
+  }
+  .role-btn.active{color:#fff;}
+
+  form label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:7px;margin-top:18px;}
+  form input[type="text"],form input[type="password"]{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;
+    font-family:inherit;font-size:14px;background:var(--ivory);color:var(--ink);
+    transition:border-color .2s;
+  }
+  form input:focus{border-color:var(--gold-deep);outline:none;}
+  .form-row{display:flex;align-items:center;justify-content:space-between;margin-top:16px;font-size:13px;}
+  .checkbox{display:flex;align-items:center;gap:7px;font-weight:600;color:var(--muted);}
+  .checkbox input{accent-color:var(--gold-deep);}
+  .link{color:var(--navy-soft);font-weight:700;}
+  .link:hover{color:var(--gold-deep);}
+
+  .btn-primary.full{
+    width:100%;margin-top:26px;background:var(--gold);color:var(--navy);
+    font-weight:800;font-size:15px;padding:14px;border-radius:8px;
+    box-shadow:0 10px 22px rgba(30,42,74,.18);transition:transform .2s,box-shadow .2s,background .2s;
+  }
+  .btn-primary.full:hover{background:var(--gold-deep);transform:translateY(-2px);}
+
+  .error-msg{
+    margin-top:14px;background:var(--danger-pale);color:var(--danger);
+    font-size:13px;font-weight:700;padding:10px 14px;border-radius:8px;
+  }
+
+  .back-link{margin-top:30px;text-align:center;font-size:13px;}
+  .back-link a{color:var(--muted);font-weight:700;}
+  .back-link a:hover{color:var(--navy);}
+
+  .demo-hint{
+    margin-top:18px;font-size:12px;color:var(--muted);background:var(--cream);
+    border:1px dashed var(--line);padding:10px 12px;border-radius:8px;line-height:1.6;
+  }
+
+  @media (max-width:860px){
+    .login-shell{flex-direction:column;}
+    .login-aside{flex:none;padding:32px 28px;min-height:220px;}
+    .aside-copy{margin-top:24px;}
+    .aside-foot{display:none;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="login-shell">
+    <aside class="login-aside">
+      <div class="brand-mini">
+        <svg viewBox="0 0 64 64" role="img" aria-label="Logo KB TK Mary Anthony">
+          <circle cx="32" cy="32" r="30" fill="#FFFFFF" stroke="#C9A961" stroke-width="2.5"/>
+          <circle cx="24" cy="25" r="7" fill="#1E2A4A"/>
+          <path d="M12 48c0-9 5.5-15 12-15s12 6 12 15" fill="#1E2A4A"/>
+          <circle cx="41" cy="24" r="7" fill="#7E9182"/>
+          <path d="M29 48c0-9.5 5.7-15.5 12-15.5s12 6 12 15.5" fill="#7E9182"/>
+        </svg>
+        <span>KB - TK Mary Anthony</span>
+      </div>
+      <div class="aside-copy">
+        <p class="eyebrow">Portal Sekolah</p>
+        <h1>Selamat datang kembali</h1>
+        <p>Masuk untuk mengelola data siswa, guru, pendaftaran, dan kegiatan harian si kecil — semua dalam satu tempat.</p>
+      </div>
+      <p class="aside-foot">&copy; 2026 KB - TK Mary Anthony</p>
+    </aside>
+
+    <main class="login-main">
+      <div class="login-card">
+        <h2>Masuk ke akun Anda</h2>
+        <p class="sub">Pilih peran Anda untuk melanjutkan</p>
+
+        <div class="role-toggle" role="tablist" aria-label="Pilih peran">
+          <span class="role-indicator" id="roleIndicator" aria-hidden="true"></span>
+          <button type="button" class="role-btn active" data-role="admin" role="tab" aria-selected="true">Admin</button>
+          <button type="button" class="role-btn" data-role="guru" role="tab" aria-selected="false">Guru</button>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <label for="username">Email / Username</label>
+          <input type="text" id="username" autocomplete="username" placeholder="contoh: admin@tkmaryanthony.sch.id" required>
+
+          <label for="password">Kata Sandi</label>
+          <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" required>
+
+          <div class="form-row">
+            <label class="checkbox"><input type="checkbox" id="remember"> Ingat saya</label>
+            <a href="#" class="link">Lupa kata sandi?</a>
+          </div>
+
+          <button type="submit" class="btn-primary full">Masuk sebagai <span id="roleLabel">Admin</span></button>
+          <p class="error-msg" id="loginError" hidden>Email/username dan kata sandi wajib diisi.</p>
+        </form>
+
+        <p class="demo-hint">Mode demo: isi email &amp; kata sandi bebas (belum terhubung ke server), lalu klik Masuk untuk melihat tampilan dashboard sesuai peran yang dipilih.</p>
+
+        <p class="back-link"><a href="index.html">&larr; Kembali ke beranda</a></p>
+      </div>
+    </main>
+  </div>
+
+<script>
+  const roleBtns = document.querySelectorAll('.role-btn');
+  const roleIndicator = document.getElementById('roleIndicator');
+  const roleLabel = document.getElementById('roleLabel');
+  let currentRole = 'admin';
+
+  roleBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      roleBtns.forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');});
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected','true');
+      currentRole = btn.dataset.role;
+      roleIndicator.style.transform = currentRole === 'guru' ? 'translateX(100%)' : 'translateX(0)';
+      roleLabel.textContent = currentRole === 'guru' ? 'Guru' : 'Admin';
+    });
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    const errEl = document.getElementById('loginError');
+    if(!u || !p){
+      errEl.hidden = false;
+      return;
+    }
+    errEl.hidden = true;
+    window.location.href = currentRole === 'guru' ? 'teacher-dashboard.html' : 'admin-dashboard.html';
+  });
+</script>
+</body>
+</html>
